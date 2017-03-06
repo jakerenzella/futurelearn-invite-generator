@@ -1,0 +1,26 @@
+{
+  "name": "futurelearn-invite-generator",
+  "version": "1.0.0",
+  "description": "From the Calister export, generate csv's for Discourse and Doubtfire.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakerenzella/futurelearn-invite-generator.git"
+  },
+  "author": "Jake Renzella",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jakerenzella/futurelearn-invite-generator/issues"
+  },
+  "homepage": "https://github.com/jakerenzella/futurelearn-invite-generator#readme",
+  "dependencies": {
+    "csv": "^1.1.1"
+  }
+}
