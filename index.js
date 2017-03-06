@@ -3,6 +3,7 @@ const stringify = require('csv-stringify')
 const fs = require('fs')
 const _ = require('lodash')
 const inquirer = require('inquirer')
+const path = process.argv.slice(2)[0]
 
 const questions = [
     {
@@ -19,7 +20,7 @@ const questions = [
     {
         type: 'input',
         name: 'topicID',
-        message: 'Which topic do you want to greet them with?',
+        message: 'Which topic ID do you want to greet them with?',
         validate: function (value) {
             var valid = !isNaN(parseInt(value))
             return valid || 'Please enter a number'
@@ -71,10 +72,26 @@ var parser = parse({}, function (err, input_csv) {
     generate_doubtfire_csv(data, csv_properties)
 })
 
+var testFile = function (csvFile) {
+    fs.stat(csvFile, function (err, stat) {
+        if (err == null) {
+            return true
+        } else if (err.code == 'ENOENT') {
+            console.log(err)
+            process.exit(1)
+        } else {
+            console.log('Some other error: ', err.code)
+            process.exit(1)
+        }
+    })
+}
+
 var start = function () {
+    testFile(path)
+
     inquirer.prompt(questions).then(function (answers) {
         glob_answers = answers
-        fs.createReadStream('sua_download.csv').pipe(parser)
+        fs.createReadStream(path).pipe(parser)
     })
 }
 
