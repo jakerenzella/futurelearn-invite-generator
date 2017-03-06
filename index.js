@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const parse = require('csv-parse')
 const stringify = require('csv-stringify')
 const fs = require('fs')
