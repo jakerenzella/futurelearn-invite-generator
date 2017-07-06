@@ -1,6 +1,6 @@
 {
   "name": "deakin-futurelearn-invite-generator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "From the Calister export, generate csv's for Discourse and Doubtfire.",
   "main": "index.js",
   "directories": {
