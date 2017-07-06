@@ -6,6 +6,8 @@ const fs = require('fs')
 const _ = require('lodash')
 const inquirer = require('inquirer')
 const path = process.argv.slice(2)[0]
+const pathExistingDF = process.argv[3]
+var util = require( "util" );
 
 const questions = [
     {
@@ -32,8 +34,9 @@ const questions = [
 ]
 
 var glob_answers
+var existing_students
 
-var generate_doubtfire_csv = function (data, csv_properties) {
+var generate_doubtfire_csv = function (kind, data, csv_properties) {
     var new_data = _.map(data, function (o) {
         return [glob_answers.unitCode, o[csv_properties.email_idx], o[csv_properties.student_id_idx], o[csv_properties.first_name_idx], o[csv_properties.last_name_idx], o[csv_properties.email_idx] + '@deakin.edu.au', '']
     })
@@ -41,7 +44,7 @@ var generate_doubtfire_csv = function (data, csv_properties) {
     new_data.unshift(['unit_code', 'username', 'student_id', 'first_name', 'last_name', 'email', 'tutorial'])
 
     stringify(new_data, function (err, output) {
-        fs.writeFileSync('doubtfire_invites.csv', output)
+        fs.writeFileSync( util.format("doubtfire_%s.csv", kind), output)
     })
 }
 
@@ -66,12 +69,35 @@ var parser = parse({}, function (err, input_csv) {
         last_name_idx: _.indexOf(headers, 'Surname')
     }
 
-    var data = _.filter(input_csv, function (o) {
+    var enrolled_students = _.filter(input_csv, function (o) {
         return o[csv_properties.enrollment_status_idx] == 'ENROLLED'
     })
 
+    var data = _.filter(input_csv, function (o) {
+        return o[csv_properties.enrollment_status_idx] == 'ENROLLED' && ! _.includes(existing_students, o[csv_properties.email_idx])
+    })
+
     generate_discourse_csv(data, csv_properties)
-    generate_doubtfire_csv(data, csv_properties)
+    generate_doubtfire_csv("enrol", data, csv_properties)
+
+    data = _.filter(input_csv, function (o) {
+        return o[csv_properties.enrollment_status_idx] == 'DISCONTIN' && _.includes(existing_students, o[csv_properties.email_idx]) && ! _.includes(enrolled_students, o[csv_properties.email_idx] )
+    })
+
+    generate_doubtfire_csv("withdraw", data, csv_properties)
+})
+
+var existingDFParser = parse({}, function(err, input_csv) {
+    const headers = input_csv[0]
+    var csv_properties = {
+        username_idx: _.indexOf(headers, 'username'),
+    }
+
+    var data = _.map(input_csv.slice(1), function (o) {
+        return o[csv_properties.username_idx]
+    })
+
+    existing_students = data
 })
 
 var testFile = function (csvFile) {
@@ -90,6 +116,12 @@ var testFile = function (csvFile) {
 
 var start = function () {
     testFile(path)
+
+    if (pathExistingDF )
+    {
+        testFile(pathExistingDF)
+        fs.createReadStream(pathExistingDF).pipe(existingDFParser)
+    } 
 
     inquirer.prompt(questions).then(function (answers) {
         glob_answers = answers
