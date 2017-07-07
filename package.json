@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/jakerenzella/futurelearn-invite-generator#readme",
   "dependencies": {
+    "commander": "^2.11.0",
     "csv": "^1.1.1",
     "inquirer": "^3.0.6",
     "jquery": "^3.1.1",

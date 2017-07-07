@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 
+var program = require('commander');
 const parse = require('csv-parse')
 const stringify = require('csv-stringify')
 const fs = require('fs')
